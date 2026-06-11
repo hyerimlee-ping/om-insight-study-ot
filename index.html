@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>신뢰감 주는 OT 팁</title>
+  <style>
+    :root {
+      --red: #FF5E46;
+      --red-dark: #AF4C3C;
+      --red-light: rgba(255,94,70,0.10);
+      --dark: #372E2D;
+      --white: #FFFFFF;
+      --bg: #F5EDEB;
+      --line: #E2D5D2;
+      --gray: #8C6F6B;
+      --shadow-sm: 0 2px 8px rgba(55,46,45,0.10);
+      --shadow-md: 0 4px 20px rgba(55,46,45,0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--dark);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .deck { width: 100%; height: 100vh; position: relative; }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 56px 80px;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+    .slide.active { display: flex; opacity: 1; }
+
+    .slide-cover   { background: var(--white); text-align: center; }
+    .slide-section { background: #5C423E; text-align: center; color: var(--white); }
+    .slide-content { background: var(--white); align-items: flex-start; justify-content: flex-start; padding-top: 48px; }
+
+    .label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 10px;
+    }
+    .slide-section .label { color: rgba(255,255,255,0.65); }
+
+    h1 { font-size: clamp(38px, 5vw, 62px); font-weight: 800; line-height: 1.15; letter-spacing: -1.5px; }
+    h2 { font-size: clamp(22px, 3vw, 36px); font-weight: 700; line-height: 1.2; margin-bottom: 6px; letter-spacing: -0.5px; }
+    h3 { font-size: 17px; font-weight: 700; color: var(--red); margin-bottom: 8px; }
+    p  { font-size: 15px; line-height: 1.75; color: #333; }
+
+    .sub { font-size: clamp(14px, 1.8vw, 18px); color: var(--gray); margin-top: 14px; line-height: 1.6; }
+    .slide-section .sub { color: rgba(255,255,255,0.65); }
+    .hl { color: var(--red); }
+
+    .tag {
+      display: inline-block;
+      background: var(--red-light);
+      border: 1px solid rgba(255,94,70,0.35);
+      color: var(--red);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .divider { width: 40px; height: 3px; background: var(--red); border-radius: 2px; margin: 12px 0 20px; }
+
+    /* 카드 */
+    .card-row { display: flex; gap: 20px; width: 100%; margin-top: 4px; flex: 1; align-items: stretch; }
+    .card {
+      flex: 1;
+      background: var(--white);
+      border-radius: 18px;
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--red);
+      gap: 8px;
+    }
+    .card .emoji { font-size: 32px; margin-bottom: 6px; }
+    .card h3 { font-size: 16px; }
+    .card p { font-size: 14px; }
+
+    /* 체크리스트 */
+    ul.styled { list-style: none; margin-top: 14px; }
+    ul.styled li {
+      font-size: 14px;
+      color: #333;
+      padding: 9px 0 9px 22px;
+      position: relative;
+      border-bottom: 1px solid var(--line);
+      line-height: 1.6;
+    }
+    ul.styled li:last-child { border-bottom: none; }
+    ul.styled li::before { content: '→'; position: absolute; left: 0; color: var(--red); font-weight: 700; }
+    ul.styled li strong { color: var(--dark); }
+
+    /* 팁 그리드 */
+    .tip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; flex: 1; }
+    .tip-card {
+      background: rgba(32,33,36,0.03);
+      border-radius: 16px;
+      padding: 22px 24px;
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--red);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .tip-num { font-size: 11px; font-weight: 700; color: var(--red); letter-spacing: 1px; opacity: 0.7; }
+    .tip-title { font-size: 16px; font-weight: 700; color: var(--dark); }
+    .tip-desc { font-size: 13px; color: var(--gray); line-height: 1.65; margin-top: 2px; }
+
+    /* 눈빛 예시 박스 */
+    .example-box {
+      background: rgba(255,94,70,0.06);
+      border-left: 3px solid var(--red);
+      border-radius: 0 14px 14px 0;
+      padding: 20px 24px;
+      margin-top: 18px;
+      width: 100%;
+    }
+    .example-box .ex-label {
+      font-size: 11px; font-weight: 700; color: var(--red);
+      letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;
+    }
+    .example-box .ex-text { font-size: 16px; color: var(--dark); line-height: 1.8; font-weight: 500; }
+    .example-box .ex-note { margin-top: 12px; font-size: 13px; color: var(--gray); padding-top: 12px; border-top: 1px solid rgba(255,94,70,0.2); line-height: 1.6; }
+
+    /* 실습 */
+    .practice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; margin-top: 4px; }
+    .practice-box {
+      background: rgba(32,33,36,0.03);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid var(--line);
+    }
+    .practice-box .pb-label { font-size: 11px; font-weight: 700; color: var(--red); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+    .practice-box .pb-title { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+    .practice-box .pb-list { font-size: 13px; color: var(--gray); line-height: 1.9; }
+
+    .checklist-box {
+      background: rgba(32,33,36,0.03);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      grid-column: span 2;
+    }
+    .checklist-box .cb-label { font-size: 11px; font-weight: 700; color: var(--red); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+    .check-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .check-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600; color: #333;
+      background: var(--white); border-radius: 10px; padding: 10px 14px;
+      border: 1px solid rgba(32,33,36,0.08);
+    }
+    .check-box {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,94,70,0.5);
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    /* 마무리 */
+    .summary-row { display: flex; gap: 20px; width: 100%; max-width: 800px; margin-top: 32px; }
+    .summary-pill {
+      flex: 1; background: var(--white);
+      border: 1.5px solid rgba(255,94,70,0.3);
+      border-radius: 16px; padding: 18px 20px;
+      text-align: center; box-shadow: var(--shadow-sm);
+    }
+    .summary-pill .sp-num { font-size: 22px; font-weight: 800; color: var(--red); margin-bottom: 6px; }
+    .summary-pill .sp-text { font-size: 13px; font-weight: 700; color: var(--dark); line-height: 1.5; }
+
+    /* 네비게이션 */
+    #slide-counter { position: fixed; bottom: 32px; left: 40px; font-size: 12px; color: var(--gray); z-index: 100; }
+    nav { position: fixed; bottom: 24px; right: 40px; display: flex; gap: 8px; z-index: 100; }
+    nav button {
+      background: rgba(32,33,36,0.06);
+      border: 1px solid rgba(32,33,36,0.12);
+      color: var(--dark);
+      font-size: 13px;
+      padding: 9px 22px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.18s;
+      font-family: inherit;
+    }
+    nav button:hover { background: var(--red); border-color: var(--red); color: white; }
+
+    .dots { position: fixed; top: 22px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 100; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(32,33,36,0.18); cursor: pointer; transition: background 0.2s, transform 0.2s; }
+    .dot.active { background: var(--red); transform: scale(1.5); }
+  </style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- 0. COVER -->
+  <div class="slide slide-cover active">
+    <div class="label">인사이트 미니 세션</div>
+    <h1>신뢰감 주는<br/><span class="hl">OT 팁</span></h1>
+  </div>
+
+  <!-- 1. SECTION 사전준비 -->
+  <div class="slide slide-section">
+    <div class="label">Part 01</div>
+    <h1>내가 먼저<br/>가장 잘 알아야 한다</h1>
+    <p class="sub">신뢰는 준비에서 시작된다</p>
+  </div>
+
+  <!-- 2. 사전 준비 상세 -->
+  <div class="slide slide-content">
+    <div class="tag">사전 준비</div>
+    <h2>학습자가 알아야 할 것, <span class="hl">내가 먼저 완벽히 파악</span></h2>
+    <div class="divider"></div>
+    <div class="card-row">
+      <div class="card">
+        <div class="emoji">🗺️</div>
+        <h3>학습 여정</h3>
+        <p>전체 커리큘럼 흐름, 과목 순서, 각 세션의 목적을 정확히 이해하고 설명할 수 있어야 한다</p>
+        <div style="margin-top:10px; padding:10px 14px; background:var(--red-light); border-radius:10px; font-size:12px; color:var(--red); font-weight:600; line-height:1.6;">
+          💡 커리큘럼이 어렵다면?<br/>
+          <span style="font-weight:500; color:var(--gray);">AI에게 "문과생도 이해할 수 있게 설명해줘" 라고 물어보기</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="emoji">🎯</div>
+        <h3>수료 기준</h3>
+        <p>출석 기준, 과제 제출 기한, 평가 방식 등 수료 조건을 완전히 숙지해야 한다</p>
+      </div>
+      <div class="card">
+        <div class="emoji">📌</div>
+        <h3>특이사항</h3>
+        <p>이번 기수에서 달라진 점, 주의사항, 자주 묻는 질문을 미리 파악해둬야 한다</p>
+        <div style="margin-top:10px; padding:10px 14px; background:var(--red-light); border-radius:10px; font-size:12px; color:var(--red); font-weight:600; line-height:1.6;">
+          💡 현장 도착 후 바로 파악하기<br/>
+          <span style="font-weight:500; color:var(--gray);">화장실 위치, 정수기 위치 등 학습자가 물어볼 수 있는 기본 사항은 미리 확인</span>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:16px; padding: 14px 20px; background: var(--red-light); border-radius: 12px; font-size: 14px; color: var(--red); font-weight: 600; width: 100%;">
+      → 이 내용을 바탕으로 OT 자료를 직접 만들기 — 이 과정이 가장 중요한 단계
+    </div>
+  </div>
+
+  <!-- 3. SECTION 말하기 -->
+  <div class="slide slide-section">
+    <div class="label">Part 02</div>
+    <h1>말하는 방법</h1>
+    <p class="sub">전달 방식이 신뢰를 만든다</p>
+  </div>
+
+  <!-- 4. 말하기 팁 -->
+  <div class="slide slide-content">
+    <div class="tag">말하는 방법</div>
+    <h2>이렇게 말하면 <span class="hl">신뢰감이 달라진다</span></h2>
+    <div class="divider"></div>
+    <div class="tip-grid">
+      <div class="tip-card">
+        <div class="tip-num">TIP 01</div>
+        <div class="tip-title">실제 내 말로 대본 쓰기</div>
+        <div class="tip-desc">OT 자료 기반으로 대본 쓸 때, 내가 실제로 말하는 표현 그대로 쓴다. 글 쓰듯 쓰지 않는다.</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-num">TIP 02</div>
+        <div class="tip-title">말을 앞으로 밀듯이</div>
+        <div class="tip-desc">말 에너지를 앞으로 던지듯 전달한다. 목소리가 앞을 향하면 전달력과 신뢰감이 올라간다.</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-num">TIP 03</div>
+        <div class="tip-title">천천히, 숨 쉬며 말하기</div>
+        <div class="tip-desc">빠르게 말하지 않는다. 여유 있게 호흡을 챙기며 말하면 더 믿음직스럽게 들린다.</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-num">TIP 04</div>
+        <div class="tip-title">중요한 지점 전 살짝 쉬기</div>
+        <div class="tip-desc">핵심 내용 직전 0.5~1초 쉬고 말한다. 침묵이 강조 효과를 만든다.</div>
+      </div>
+    </div>
+    <div style="margin-top:16px; padding: 14px 20px; background: rgba(32,33,36,0.04); border-radius:12px; font-size:14px; color:rgba(32,33,36,0.7); font-weight:600; width:100%; border-left: 3px solid var(--red); display:flex; flex-direction:column; gap:8px;">
+      <div>+ 말 끝맺음 흐리지 않기 — 문장을 완성해서 끝낸다. "~인데요...", "~거든요..." 는 신뢰도를 낮춘다</div>
+      <div style="font-size:13px; color:var(--gray); font-weight:500;">+ 의도적으로 말 끝음 내리지 말기 (SNL 기자처럼 ❌)</div>
+    </div>
+  </div>
+
+  <!-- 5. SECTION 눈빛 -->
+  <div class="slide slide-section">
+    <div class="label">Part 03</div>
+    <h1>눈빛</h1>
+    <p class="sub">"나를 보고 있다"는 느낌이 신뢰의 출발점</p>
+  </div>
+
+  <!-- 6. 눈빛 상세 -->
+  <div class="slide slide-content">
+    <div class="tag">눈빛</div>
+    <h2>모든 학습자에게 <span class="hl">고르게 시선 주기</span></h2>
+    <div class="divider"></div>
+    <ul class="styled" style="width:100%;">
+      <li>한 명에게만 집중하거나 허공을 보며 말하지 않는다</li>
+      <li>말하는 중간중간 <strong>왼쪽 → 중앙 → 오른쪽</strong> 순서로 시선을 이동한다</li>
+      <li>자료 화면을 등지고 말하는 시간을 늘린다 — 자료에 의존하지 않는 것 자체가 신뢰감을 높인다</li>
+    </ul>
+    <div class="example-box">
+      <div class="ex-label">Example</div>
+      <div class="ex-text">
+        "안녕하세요, 패스트캠퍼스 ㅇㅇㅇ입니다.<br/>이렇게 만나뵙게 되어서 반갑습니다."
+      </div>
+      <div class="ex-note">
+        → 이 두 문장을 말하는 동안, 학습자 전체를 천천히 한 번 둘러본다<br/>
+        자기소개처럼 짧은 문장도 시선 연습의 좋은 기회다<br/>
+        → 시선과 미소도 함께!
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. SECTION 외모 -->
+  <div class="slide slide-section">
+    <div class="label">Part 04</div>
+    <h1>TPO에 맞는<br/>모습 갖추기</h1>
+    <p class="sub">말 한마디 하기 전, 모습에서 이미 신뢰도가 결정된다</p>
+  </div>
+
+  <!-- 8. 외모 상세 -->
+  <div class="slide slide-content">
+    <div class="tag">TPO</div>
+    <h2>TPO에 맞는 모습 = <span class="hl">"나는 이 자리를 진지하게 준비했다"</span></h2>
+    <div class="divider"></div>
+    <div class="card-row">
+      <div class="card" style="align-items:center; text-align:center;">
+        <div class="emoji">👔</div>
+        <h3>복장</h3>
+        <p>교육 성격에 맞는 단정한 복장<br/>너무 캐주얼하거나 튀는 스타일은 피한다<br/>깔끔함 = 준비된 운영자의 인상</p>
+      </div>
+      <div class="card" style="align-items:center; text-align:center;">
+        <div class="emoji">✂️</div>
+        <h3>헤어스타일</h3>
+        <p>정돈된 헤어스타일 유지<br/>앞머리가 얼굴을 가리거나 흐트러지지 않게<br/>시선 교환을 방해하지 않도록</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. SECTION 실습 -->
+  <div class="slide slide-section">
+    <div class="label">Practice</div>
+    <h1>직접 해보고<br/>함께 피드백</h1>
+    <p class="sub">배운 내용은 몸에 익혀야 진짜 내 것이 된다</p>
+  </div>
+
+  <!-- 10. 실습 안내 -->
+  <div class="slide slide-content">
+    <div class="tag">실습 안내</div>
+    <h2>각자 OT를 진행하고, <span class="hl">스스로 체크해보기</span></h2>
+    <div class="divider"></div>
+    <div class="practice-grid">
+      <div class="practice-box" style="grid-column: span 2;">
+        <div class="pb-label">혼자 연습하는 법</div>
+        <ul class="styled" style="margin-top:8px;">
+          <li><strong>소리 내어 말해보기</strong> — 실제 OT라고 생각하고 처음부터 끝까지 진행</li>
+          <li><strong>핸드폰으로 녹음해서 들어보기</strong> — 말 속도, 끝맺음, 흐림 직접 확인</li>
+          <li><strong>거울 보며 연습하기</strong> — 눈빛, 표정, 시선 분배 체크</li>
+          <li><strong>영상 촬영 후 셀프 피드백</strong> — 전체적인 인상을 객관적으로 보기</li>
+          <li><strong>OT 대본 소리 내어 읽기</strong> — 내 언어로 자연스럽게 말할 수 있을 때까지</li>
+        </ul>
+      </div>
+      <div class="checklist-box">
+        <div class="cb-label">Self Checklist</div>
+        <div class="check-grid">
+          <div class="check-item"><div class="check-box"></div>내용을 충분히 숙지했는가?</div>
+          <div class="check-item"><div class="check-box"></div>말 속도가 적절한가?</div>
+          <div class="check-item"><div class="check-box"></div>문장을 완성해서 끝내는가?</div>
+          <div class="check-item"><div class="check-box"></div>모두에게 고르게 시선을 주는가?</div>
+          <div class="check-item"><div class="check-box"></div>중요 내용 전에 잠깐 쉬는가?</div>
+          <div class="check-item"><div class="check-box"></div>전반적인 신뢰감이 느껴지는가?</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. WRAP-UP -->
+  <div class="slide slide-cover">
+    <div class="label">핵심 요약</div>
+    <h1>신뢰감은<br/><span class="hl">네 가지가 함께</span> 작동할 때</h1>
+    <p class="sub" style="font-size:15px; max-width:560px;">준비, 말투, 눈빛, 모습 — 하나씩 쌓아가면<br/>학습자는 "이 운영자를 믿어도 되겠다"고 느낀다</p>
+    <div class="summary-row">
+      <div class="summary-pill">
+        <div class="sp-num">01</div>
+        <div class="sp-text">내가 가장<br/>잘 알기</div>
+      </div>
+      <div class="summary-pill">
+        <div class="sp-num">02</div>
+        <div class="sp-text">천천히<br/>완성된 문장으로</div>
+      </div>
+      <div class="summary-pill">
+        <div class="sp-num">03</div>
+        <div class="sp-text">모두에게<br/>눈 맞추기</div>
+      </div>
+      <div class="summary-pill">
+        <div class="sp-num">04</div>
+        <div class="sp-text">TPO에 맞는<br/>모습 갖추기</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="dots" id="dots"></div>
+<nav>
+  <button onclick="move(-1)">← 이전</button>
+  <button onclick="move(1)">다음 →</button>
+</nav>
+<div id="slide-counter"></div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dotsContainer = document.getElementById('dots');
+  const counter = document.getElementById('slide-counter');
+  let cur = 0;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsContainer.appendChild(d);
+  });
+
+  function goTo(n) {
+    slides[cur].style.display = 'none';
+    slides[cur].classList.remove('active');
+    cur = (n + slides.length) % slides.length;
+    slides[cur].style.display = 'flex';
+    slides[cur].classList.add('active');
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === cur));
+    counter.textContent = (cur + 1) + ' / ' + slides.length;
+  }
+
+  function move(dir) { goTo(cur + dir); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') move(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')  move(-1);
+  });
+
+  counter.textContent = '1 / ' + slides.length;
+</script>
+</body>
+</html>
